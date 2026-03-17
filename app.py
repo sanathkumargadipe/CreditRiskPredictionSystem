@@ -10,61 +10,86 @@ model = joblib.load("credit_model.pkl")
 # Page config
 st.set_page_config(page_title="Credit Risk System", layout="wide")
 
+
 # HEADER
 
 st.title("Credit Risk System")
 
-#  IMAGE SECTION
-st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-    use_column_width=True)
+# MAIN IMAGE
+st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1", use_column_width=True)
 
 st.markdown("---")
 
-# SIDEBAR INPUT
+# SIDEBAR INPUT (UPDATED WITH LABELS)
 
 st.sidebar.header("Input Features")
 
-credit_history = st.sidebar.selectbox("Credit History", [0,1])
+# Credit History
+credit_history_label = st.sidebar.selectbox("Credit History", ["Bad", "Good"])
+credit_history = 0 if credit_history_label == "Bad" else 1
+
+# Loan Amount (no upper limit)
 amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
+
+# Duration
 duration = st.sidebar.slider("Duration (months)", 1, 72)
+
+# Age
 age = st.sidebar.slider("Age", 18, 75)
-employment_duration = st.sidebar.selectbox("Employment Duration", [0,1,2,3,4])
-savings = st.sidebar.selectbox("Savings", [0,1,2,3])
-purpose = st.sidebar.selectbox("Purpose", [0,1,2,3])
-other_debtors = st.sidebar.selectbox("Other Debtors", [0,1])
 
-# FEATURE GUIDE 
+# Employment Duration
+employment_label = st.sidebar.selectbox("Employment Duration", [
+    "Unemployed",
+    "< 1 year",
+    "1–4 years",
+    "4–7 years",
+    "7+ years"
+])
 
-st.subheader("Feature Value Guide")
+employment_mapping = {
+    "Unemployed": 0,
+    "< 1 year": 1,
+    "1–4 years": 2,
+    "4–7 years": 3,
+    "7+ years": 4
+}
+employment_duration = employment_mapping[employment_label]
 
-st.markdown("""
-**Credit History**
-- 0 = Bad  
-- 1 = Good  
+# Savings
+savings_label = st.sidebar.selectbox("Savings", [
+    "No savings",
+    "< 1000",
+    "1000–5000",
+    "> 5000"
+])
 
-**Employment Duration**
-- 0 = Unemployed  
-- 1 = < 1 year  
-- 2 = 1–4 years  
-- 3 = 4–7 years  
-- 4 = 7+ years  
+savings_mapping = {
+    "No savings": 0,
+    "< 1000": 1,
+    "1000–5000": 2,
+    "> 5000": 3
+}
+savings = savings_mapping[savings_label]
 
-**Savings**
-- 0 = No savings  
-- 1 = < 1000  
-- 2 = 1000–5000  
-- 3 = > 5000  
+# Purpose
+purpose_label = st.sidebar.selectbox("Purpose", [
+    "Car",
+    "Education",
+    "Business",
+    "Personal"
+])
 
-**Purpose**
-- 0 = Car  
-- 1 = Education  
-- 2 = Business  
-- 3 = Personal  
+purpose_mapping = {
+    "Car": 0,
+    "Education": 1,
+    "Business": 2,
+    "Personal": 3
+}
+purpose = purpose_mapping[purpose_label]
 
-**Other Debtors**
-- 0 = No  
-- 1 = Yes  
-""")
+# Other Debtors
+other_debtors_label = st.sidebar.selectbox("Other Debtors", ["No", "Yes"])
+other_debtors = 0 if other_debtors_label == "No" else 1
 
 # INPUT DATAFRAME
 
@@ -124,7 +149,7 @@ if st.sidebar.button("Predict"):
 
 st.markdown("---")
 
-# DATA VISUALS 
+# DATA VISUALS
 
 st.header("Data Insights")
 
