@@ -10,26 +10,22 @@ model = joblib.load("credit_model.pkl")
 # Page config
 st.set_page_config(page_title="Credit Risk System", layout="wide")
 
-# -----------------------------------------------------
 # HEADER
-# -----------------------------------------------------
 
 st.title("Credit Risk System")
 
-# YOUR IMAGE
+#  IMAGE SECTION
 st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f",
     use_column_width=True)
 
 st.markdown("---")
 
-# -----------------------------------------------------
 # SIDEBAR INPUT
-# -----------------------------------------------------
 
 st.sidebar.header("Input Features")
 
 credit_history = st.sidebar.selectbox("Credit History", [0,1])
-amount = st.sidebar.number_input("Loan Amount", 100, 20000)
+amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
 duration = st.sidebar.slider("Duration (months)", 1, 72)
 age = st.sidebar.slider("Age", 18, 75)
 employment_duration = st.sidebar.selectbox("Employment Duration", [0,1,2,3,4])
@@ -37,9 +33,7 @@ savings = st.sidebar.selectbox("Savings", [0,1,2,3])
 purpose = st.sidebar.selectbox("Purpose", [0,1,2,3])
 other_debtors = st.sidebar.selectbox("Other Debtors", [0,1])
 
-# -----------------------------------------------------
-# FEATURE GUIDE (NEW ADDITION)
-# -----------------------------------------------------
+# FEATURE GUIDE 
 
 st.subheader("Feature Value Guide")
 
@@ -72,9 +66,7 @@ st.markdown("""
 - 1 = Yes  
 """)
 
-# -----------------------------------------------------
 # INPUT DATAFRAME
-# -----------------------------------------------------
 
 input_data = pd.DataFrame([[
     credit_history,
@@ -96,9 +88,7 @@ input_data = pd.DataFrame([[
     "other_debtors"
 ])
 
-# -----------------------------------------------------
 # PREDICTION
-# -----------------------------------------------------
 
 st.header("Prediction")
 
@@ -134,18 +124,7 @@ if st.sidebar.button("Predict"):
 
 st.markdown("---")
 
-# -----------------------------------------------------
-# IMAGE SECTION (UNCHANGED)
-# -----------------------------------------------------
-
-st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-    use_column_width=True)
-
-st.markdown("---")
-
-# -----------------------------------------------------
-# DATA VISUALS (HEATMAP REMOVED)
-# -----------------------------------------------------
+# DATA VISUALS 
 
 st.header("Data Insights")
 
