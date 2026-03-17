@@ -137,7 +137,7 @@ st.markdown("---")
 # IMAGE SECTION (UNCHANGED)
 # -----------------------------------------------------
 
-st.image("https://www.evlo.co.uk/wp-content/uploads/2025/06/aicreditrisk.jpg.webp", use_column_width=True)
+st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f")
 
 st.markdown("---")
 
