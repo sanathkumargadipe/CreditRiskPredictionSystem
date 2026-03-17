@@ -4,31 +4,21 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load trained model
+# Load model
 model = joblib.load("credit_model.pkl")
 
-# Page configuration
+# Page config
 st.set_page_config(page_title="Credit Risk System", layout="wide")
 
 # -----------------------------------------------------
 # HEADER
 # -----------------------------------------------------
 
-st.title("AI Credit Risk Decision Support System")
-
-st.markdown("""
-### Intelligent Loan Risk Assessment Platform
-
-This system uses **Machine Learning** to analyze borrower financial data and
-predict whether a customer is **Low Risk** or **High Risk** for loan approval.
-
-The goal of this system is to assist financial institutions in making **data-driven
-credit decisions**.
-""")
+st.title("Credit Risk System")
 
 st.image(
-"https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-caption="AI-driven financial risk analysis"
+    "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
+    use_column_width=True
 )
 
 st.markdown("---")
@@ -37,198 +27,113 @@ st.markdown("---")
 # SIDEBAR INPUT
 # -----------------------------------------------------
 
-st.sidebar.header("Customer Financial Information")
+st.sidebar.header("Input Features")
 
 credit_history = st.sidebar.selectbox("Credit History", [0,1,2,3,4])
-
-amount = st.sidebar.number_input(
-"Loan Amount",
-100,
-20000
-)
-
-duration = st.sidebar.slider(
-"Loan Duration (months)",
-1,
-72
-)
-
-age = st.sidebar.slider(
-"Customer Age",
-18,
-75
-)
-
-employment_duration = st.sidebar.selectbox(
-"Employment Duration",
-[0,1,2,3,4]
-)
-
-savings = st.sidebar.selectbox(
-"Savings Level",
-[0,1,2,3,4]
-)
-
-purpose = st.sidebar.selectbox(
-"Loan Purpose",
-[0,1,2,3,4,5]
-)
-
-other_debtors = st.sidebar.selectbox(
-"Other Debtors",
-[0,1,2]
-)
+amount = st.sidebar.number_input("Loan Amount", 100, 20000)
+duration = st.sidebar.slider("Duration (months)", 1, 72)
+age = st.sidebar.slider("Age", 18, 75)
+employment_duration = st.sidebar.selectbox("Employment Duration", [0,1,2,3,4])
+savings = st.sidebar.selectbox("Savings", [0,1,2,3,4])
+purpose = st.sidebar.selectbox("Purpose", [0,1,2,3,4,5])
+other_debtors = st.sidebar.selectbox("Other Debtors", [0,1,2])
 
 # -----------------------------------------------------
-# CREATE INPUT DATAFRAME
+# INPUT DATAFRAME
 # -----------------------------------------------------
 
 input_data = pd.DataFrame([[
-credit_history,
-amount,
-duration,
-age,
-employment_duration,
-savings,
-purpose,
-other_debtors
+    credit_history,
+    amount,
+    duration,
+    age,
+    employment_duration,
+    savings,
+    purpose,
+    other_debtors
 ]], columns=[
-"credit_history",
-"amount",
-"duration",
-"age",
-"employment_duration",
-"savings",
-"purpose",
-"other_debtors"
+    "credit_history",
+    "amount",
+    "duration",
+    "age",
+    "employment_duration",
+    "savings",
+    "purpose",
+    "other_debtors"
 ])
 
 # -----------------------------------------------------
-# PREDICTION SECTION
+# PREDICTION
 # -----------------------------------------------------
 
-st.header("Credit Risk Prediction")
+st.header("Prediction")
 
-st.markdown("""
-Click the **Predict Credit Risk** button to evaluate the applicant’s
-loan repayment risk using the trained machine learning model.
-""")
-
-if st.sidebar.button("Predict Credit Risk"):
+if st.sidebar.button("Predict"):
 
     prediction = model.predict(input_data)[0]
 
     prob_good = model.predict_proba(input_data)[0][1]
     prob_bad = model.predict_proba(input_data)[0][0]
 
-    col1,col2,col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-    col1.metric("Low Risk Probability", round(prob_good,2))
-    col2.metric("High Risk Probability", round(prob_bad,2))
+    col1.metric("Low Risk", round(prob_good, 2))
+    col2.metric("High Risk", round(prob_bad, 2))
 
     if prediction == 1:
-        col3.success("Prediction: Low Risk Borrower")
+        col3.success("Low Risk")
     else:
-        col3.error("Prediction: High Risk Borrower")
+        col3.error("High Risk")
 
-    # Recommendation
     if prob_bad > 0.7:
-        recommendation = "Loan should be rejected due to high credit risk."
-
+        decision = "Reject Loan"
     elif prob_bad > 0.4:
-        recommendation = "Loan may be approved with a reduced amount or stricter conditions."
-
+        decision = "Approve with Conditions"
     else:
-        recommendation = "Loan can be approved safely."
+        decision = "Approve Loan"
 
-    st.subheader("Credit Decision Recommendation")
-    st.info(recommendation)
+    st.subheader("Decision")
+    st.info(decision)
 
-    st.subheader("Customer Input Summary")
+    st.subheader("Input Data")
     st.write(input_data)
 
 st.markdown("---")
 
 # -----------------------------------------------------
-# SYSTEM EXPLANATION
+# IMAGE SECTION
 # -----------------------------------------------------
 
-st.header("How the System Works")
-
-st.markdown("""
-The AI Credit Risk System follows these steps:
-
-1. **Data Collection** – Customer financial and demographic data is gathered.
-2. **Feature Analysis** – Important risk indicators such as credit history and savings are analyzed.
-3. **Machine Learning Prediction** – The trained model evaluates repayment probability.
-4. **Risk Classification** – The borrower is classified as Low Risk or High Risk.
-5. **Decision Recommendation** – The system suggests whether the loan should be approved.
-""")
-
 st.image(
-"https://images.unsplash.com/photo-1569025690938-a00729c9e1d1",
-caption="AI systems assisting financial decision making"
+    "https://images.unsplash.com/photo-1569025690938-a00729c9e1d1",
+    use_column_width=True
 )
 
 st.markdown("---")
 
 # -----------------------------------------------------
-# DATASET INSIGHTS
+# DATA VISUALS
 # -----------------------------------------------------
 
-st.header("Dataset Insights")
-
-st.markdown("""
-Below are some visual insights from the dataset used to train the credit risk model.
-These charts help understand patterns in loan applications.
-""")
+st.header("Data Insights")
 
 data = pd.read_csv("data/credit_data.csv")
 
-col1,col2 = st.columns(2)
+col1, col2 = st.columns(2)
 
-# Loan Amount Distribution
-fig1,ax1 = plt.subplots()
-sns.histplot(data["amount"],ax=ax1)
-ax1.set_title("Loan Amount Distribution")
+# Amount distribution
+fig1, ax1 = plt.subplots()
+sns.histplot(data["amount"], ax=ax1)
+ax1.set_title("Loan Amount")
 col1.pyplot(fig1)
 
-# Age Distribution
-fig2,ax2 = plt.subplots()
-sns.histplot(data["age"],ax=ax2)
-ax2.set_title("Customer Age Distribution")
+# Age distribution
+fig2, ax2 = plt.subplots()
+sns.histplot(data["age"], ax=ax2)
+ax2.set_title("Age")
 col2.pyplot(fig2)
 
-st.subheader("Feature Correlation Heatmap")
-
-fig3,ax3 = plt.subplots()
-
-sns.heatmap(
-data.corr(),
-annot=True,
-cmap="coolwarm",
-ax=ax3
-)
-
+# Correlation heatmap
+fig3, ax3 = plt.subplots()
+sns.heatmap(data.corr(), annot=True, cmap="coolwarm", ax=ax3)
 st.pyplot(fig3)
-
-st.markdown("---")
-
-# -----------------------------------------------------
-# FOOTER
-# -----------------------------------------------------
-
-st.markdown("""
-### Project Summary
-
-This application demonstrates how **Artificial Intelligence**
-can support financial institutions in **automating credit risk assessment**.
-
-**Key Technologies Used**
-- Python
-- Machine Learning
-- Data Visualization
-- Interactive Web Dashboard
-
-Developed as an academic project for **AI-based financial decision systems**.
-""")
