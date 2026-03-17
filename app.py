@@ -17,7 +17,8 @@ st.set_page_config(page_title="Credit Risk System", layout="wide")
 st.title("Credit Risk System")
 
 # YOUR IMAGE
-st.image("image.png", use_column_width=True)
+st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f",
+    use_column_width=True)
 
 st.markdown("---")
 
@@ -137,7 +138,8 @@ st.markdown("---")
 # IMAGE SECTION (UNCHANGED)
 # -----------------------------------------------------
 
-st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f")
+st.image("https://images.unsplash.com/photo-1554224155-6726b3ff858f",
+    use_column_width=True)
 
 st.markdown("---")
 
