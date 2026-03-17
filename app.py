@@ -117,7 +117,7 @@ st.markdown("---")
 
 st.header("Data Insights")
 
-data = pd.read_csv("data/credit_data.csv")
+data = pd.read_csv("credit_data.csv")
 
 col1, col2 = st.columns(2)
 
