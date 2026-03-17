@@ -138,7 +138,7 @@ st.markdown("---")
 # -----------------------------------------------------
 
 st.image(
-    "Image.png",
+    "image.png",
     use_column_width=True
 )
 
