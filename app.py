@@ -16,10 +16,8 @@ st.set_page_config(page_title="Credit Risk System", layout="wide")
 
 st.title("Credit Risk System")
 
-st.image(
-    "https://images.unsplash.com/photo-1554224155-6726b3ff858f",
-    use_column_width=True
-)
+# YOUR IMAGE
+st.image("image.png", use_column_width=True)
 
 st.markdown("---")
 
@@ -29,14 +27,49 @@ st.markdown("---")
 
 st.sidebar.header("Input Features")
 
-credit_history = st.sidebar.selectbox("Credit History", [0,1,2,3,4])
+credit_history = st.sidebar.selectbox("Credit History", [0,1])
 amount = st.sidebar.number_input("Loan Amount", 100, 20000)
 duration = st.sidebar.slider("Duration (months)", 1, 72)
 age = st.sidebar.slider("Age", 18, 75)
 employment_duration = st.sidebar.selectbox("Employment Duration", [0,1,2,3,4])
-savings = st.sidebar.selectbox("Savings", [0,1,2,3,4])
-purpose = st.sidebar.selectbox("Purpose", [0,1,2,3,4,5])
-other_debtors = st.sidebar.selectbox("Other Debtors", [0,1,2])
+savings = st.sidebar.selectbox("Savings", [0,1,2,3])
+purpose = st.sidebar.selectbox("Purpose", [0,1,2,3])
+other_debtors = st.sidebar.selectbox("Other Debtors", [0,1])
+
+# -----------------------------------------------------
+# FEATURE GUIDE (NEW ADDITION)
+# -----------------------------------------------------
+
+st.subheader("Feature Value Guide")
+
+st.markdown("""
+**Credit History**
+- 0 = Bad  
+- 1 = Good  
+
+**Employment Duration**
+- 0 = Unemployed  
+- 1 = < 1 year  
+- 2 = 1–4 years  
+- 3 = 4–7 years  
+- 4 = 7+ years  
+
+**Savings**
+- 0 = No savings  
+- 1 = < 1000  
+- 2 = 1000–5000  
+- 3 = > 5000  
+
+**Purpose**
+- 0 = Car  
+- 1 = Education  
+- 2 = Business  
+- 3 = Personal  
+
+**Other Debtors**
+- 0 = No  
+- 1 = Yes  
+""")
 
 # -----------------------------------------------------
 # INPUT DATAFRAME
@@ -101,18 +134,18 @@ if st.sidebar.button("Predict"):
 st.markdown("---")
 
 # -----------------------------------------------------
-# IMAGE SECTION
+# IMAGE SECTION (UNCHANGED)
 # -----------------------------------------------------
 
 st.image(
-    "https://images.unsplash.com/photo-1569025690938-a00729c9e1d1",
+    "Image.png",
     use_column_width=True
 )
 
 st.markdown("---")
 
 # -----------------------------------------------------
-# DATA VISUALS
+# DATA VISUALS (HEATMAP REMOVED)
 # -----------------------------------------------------
 
 st.header("Data Insights")
@@ -132,9 +165,3 @@ fig2, ax2 = plt.subplots()
 sns.histplot(data["age"], ax=ax2)
 ax2.set_title("Age")
 col2.pyplot(fig2)
-
-# Correlation heatmap
-fig3, ax3 = plt.subplots()
-numeric_data = data.select_dtypes(include=['number'])
-sns.heatmap(numeric_data.corr(), annot=True, cmap="coolwarm", ax=ax3)
-st.pyplot(fig3)
