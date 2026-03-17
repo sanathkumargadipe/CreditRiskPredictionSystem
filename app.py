@@ -135,5 +135,6 @@ col2.pyplot(fig2)
 
 # Correlation heatmap
 fig3, ax3 = plt.subplots()
-sns.heatmap(data.corr(), annot=True, cmap="coolwarm", ax=ax3)
+numeric_data = data.select_dtypes(include=['number'])
+sns.heatmap(numeric_data.corr(), annot=True, cmap="coolwarm", ax=ax3)
 st.pyplot(fig3)
