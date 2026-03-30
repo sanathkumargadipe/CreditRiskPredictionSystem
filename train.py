@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import pandas as pd
 import numpy as np
 import joblib
@@ -126,3 +127,33 @@ joblib.dump(model, "credit_model.pkl")
 joblib.dump(le_dict, "encoders.pkl")
 
 print("\n✅ Model trained and saved successfully!")
+=======
+import joblib
+
+from src.preprocessing import load_data, preprocess
+from src.feature_selection import select_features
+from src.train_model import build_model
+
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+
+data = load_data("data/credit_data.csv")
+
+data = preprocess(data)
+
+X, y = select_features(data)
+
+sm = SMOTE()
+
+X_res, y_res = sm.fit_resample(X, y)
+
+X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2)
+
+model = build_model()
+
+model.fit(X_train, y_train)
+
+joblib.dump(model, "models/credit_model.pkl")
+
+print("Model trained successfully")
+>>>>>>> 6c27dc6ea38ac1644b7746004d14c57db18b9a1d

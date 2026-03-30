@@ -4,116 +4,167 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from src.recommendation import get_recommendation
+# Load model
+model = joblib.load("credit_model.pkl")
 
-model = joblib.load("models/credit_model.pkl")
+# Page config
+st.set_page_config(page_title="Credit Risk System", layout="wide")
 
-st.set_page_config(page_title="AI Credit Risk System", layout="wide")
 
-st.title("AI Credit Risk Decision Support System")
+# HEADER
 
-st.sidebar.header("Customer Information")
+st.title("Credit Risk System")
 
-credit_history = st.sidebar.selectbox(
-"Credit History",
-[0,1,2,3,4]
-)
+# MAIN IMAGE
+st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1", use_column_width=True)
 
-amount = st.sidebar.number_input("Loan Amount",100,20000)
+st.markdown("---")
 
-duration = st.sidebar.slider("Loan Duration (months)",1,72)
+# SIDEBAR INPUT (UPDATED WITH LABELS)
 
-age = st.sidebar.slider("Age",18,75)
+st.sidebar.header("Input Features")
 
-employment_duration = st.sidebar.selectbox(
-"Employment Duration",
-[0,1,2,3,4]
-)
+# Credit History
+credit_history_label = st.sidebar.selectbox("Credit History", ["Bad", "Good"])
+credit_history = 0 if credit_history_label == "Bad" else 1
 
-savings = st.sidebar.selectbox(
-"Savings Level",
-[0,1,2,3,4]
-)
+# Loan Amount (no upper limit)
+amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
 
-purpose = st.sidebar.selectbox(
-"Loan Purpose",
-[0,1,2,3,4,5]
-)
+# Duration
+duration = st.sidebar.slider("Duration (months)", 1, 72)
 
-other_debtors = st.sidebar.selectbox(
-"Other Debtors",
-[0,1,2]
-)
+# Age
+age = st.sidebar.slider("Age", 18, 75)
 
-input_data = pd.DataFrame([[
-credit_history,
-amount,
-duration,
-age,
-employment_duration,
-savings,
-purpose,
-other_debtors
-]],columns=[
-"credit_history",
-"amount",
-"duration",
-"age",
-"employment_duration",
-"savings",
-"purpose",
-"other_debtors"
+# Employment Duration
+employment_label = st.sidebar.selectbox("Employment Duration", [
+    "Unemployed",
+    "< 1 year",
+    "1–4 years",
+    "4–7 years",
+    "7+ years"
 ])
 
-if st.sidebar.button("Predict Credit Risk"):
+employment_mapping = {
+    "Unemployed": 0,
+    "< 1 year": 1,
+    "1–4 years": 2,
+    "4–7 years": 3,
+    "7+ years": 4
+}
+employment_duration = employment_mapping[employment_label]
 
-    prob = model.predict_proba(input_data)[0][1]
+# Savings
+savings_label = st.sidebar.selectbox("Savings", [
+    "No savings",
+    "< 1000",
+    "1000–5000",
+    "> 5000"
+])
+
+savings_mapping = {
+    "No savings": 0,
+    "< 1000": 1,
+    "1000–5000": 2,
+    "> 5000": 3
+}
+savings = savings_mapping[savings_label]
+
+# Purpose
+purpose_label = st.sidebar.selectbox("Purpose", [
+    "Car",
+    "Education",
+    "Business",
+    "Personal"
+])
+
+purpose_mapping = {
+    "Car": 0,
+    "Education": 1,
+    "Business": 2,
+    "Personal": 3
+}
+purpose = purpose_mapping[purpose_label]
+
+# Other Debtors
+other_debtors_label = st.sidebar.selectbox("Other Debtors", ["No", "Yes"])
+other_debtors = 0 if other_debtors_label == "No" else 1
+
+# INPUT DATAFRAME
+
+input_data = pd.DataFrame([[
+    credit_history,
+    amount,
+    duration,
+    age,
+    employment_duration,
+    savings,
+    purpose,
+    other_debtors
+]], columns=[
+    "credit_history",
+    "amount",
+    "duration",
+    "age",
+    "employment_duration",
+    "savings",
+    "purpose",
+    "other_debtors"
+])
+
+# PREDICTION
+
+st.header("Prediction")
+
+if st.sidebar.button("Predict"):
 
     prediction = model.predict(input_data)[0]
 
-    col1,col2,col3 = st.columns(3)
+    prob_good = model.predict_proba(input_data)[0][1]
+    prob_bad = model.predict_proba(input_data)[0][0]
 
-    col1.metric("Risk Probability",round(prob,2))
+    col1, col2, col3 = st.columns(3)
 
-    if prediction==1:
-        col2.success("Low Risk")
+    col1.metric("Low Risk", round(prob_good, 2))
+    col2.metric("High Risk", round(prob_bad, 2))
+
+    if prediction == 1:
+        col3.success("Low Risk")
     else:
-        col2.error("High Risk")
+        col3.error("High Risk")
 
-    recommendation = get_recommendation(prob)
+    if prob_bad > 0.7:
+        decision = "Reject Loan"
+    elif prob_bad > 0.4:
+        decision = "Approve with Conditions"
+    else:
+        decision = "Approve Loan"
 
-    col3.info(recommendation)
+    st.subheader("Decision")
+    st.info(decision)
 
-    st.subheader("Customer Input Summary")
-
+    st.subheader("Input Data")
     st.write(input_data)
 
-st.subheader("Dataset Insights")
+st.markdown("---")
 
-data = pd.read_csv("data/credit_data.csv")
+# DATA VISUALS
 
-col1,col2 = st.columns(2)
+st.header("Data Insights")
 
-fig1,ax1 = plt.subplots()
+data = pd.read_csv("credit_data.csv")
 
-sns.histplot(data["amount"],ax=ax1)
+col1, col2 = st.columns(2)
 
-ax1.set_title("Loan Amount Distribution")
-
+# Amount distribution
+fig1, ax1 = plt.subplots()
+sns.histplot(data["amount"], ax=ax1)
+ax1.set_title("Loan Amount")
 col1.pyplot(fig1)
 
-fig2,ax2 = plt.subplots()
-
-sns.histplot(data["age"],ax=ax2)
-
-ax2.set_title("Age Distribution")
-
+# Age distribution
+fig2, ax2 = plt.subplots()
+sns.histplot(data["age"], ax=ax2)
+ax2.set_title("Age")
 col2.pyplot(fig2)
-
-st.subheader("Correlation Heatmap")
-
-fig3,ax3 = plt.subplots()
-
-sns.heatmap(data.corr(),ax=ax3)
-
-st.pyplot(fig3)
