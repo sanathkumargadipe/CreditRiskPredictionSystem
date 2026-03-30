@@ -1,24 +1,8 @@
-<<<<<<< HEAD
-streamlit
 pandas
 numpy
 scikit-learn
 lightgbm
 catboost
-shap
 imbalanced-learn
-matplotlib
-seaborn
-=======
-streamlit
-pandas
-numpy
-scikit-learn
-lightgbm
-catboost
-shap
-imbalanced-learn
-matplotlib
-seaborn
->>>>>>> 6c27dc6ea38ac1644b7746004d14c57db18b9a1d
 joblib
+streamlit
