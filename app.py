@@ -68,6 +68,8 @@ property_val = st.sidebar.selectbox(
     list(encoders["property"].classes_)
 )
 
+installment_rate = st.sidebar.slider("Installment Rate (%)", 1, 4)
+
 # CREATE INPUT DATAFRAME (ALL 12 FEATURES)
 input_data = pd.DataFrame([[
     credit_history,
