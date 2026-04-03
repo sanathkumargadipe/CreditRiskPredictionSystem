@@ -4,31 +4,28 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load model
+# Load model and encoders
 model = joblib.load("credit_model.pkl")
+encoders = joblib.load("encoders.pkl")
 
 # Page config
 st.set_page_config(page_title="Credit Risk System", layout="wide")
 
-
 # HEADER
-
 st.title("Credit Risk System")
 
 # MAIN IMAGE
-st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1", use_column_width=True)
+st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1", width=700)
 
 st.markdown("---")
 
-# SIDEBAR INPUT (UPDATED WITH LABELS)
-
+# SIDEBAR INPUT
 st.sidebar.header("Input Features")
 
 # Credit History
-credit_history_label = st.sidebar.selectbox("Credit History", ["Bad", "Good"])
-credit_history = 0 if credit_history_label == "Bad" else 1
+credit_history = st.sidebar.selectbox("Credit History", ["good", "bad"])
 
-# Loan Amount (no upper limit)
+# Loan Amount
 amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
 
 # Duration
@@ -38,61 +35,45 @@ duration = st.sidebar.slider("Duration (months)", 1, 72)
 age = st.sidebar.slider("Age", 18, 75)
 
 # Employment Duration
-employment_label = st.sidebar.selectbox("Employment Duration", [
-    "Unemployed",
-    "< 1 year",
-    "1–4 years",
-    "4–7 years",
-    "7+ years"
-])
-
-employment_mapping = {
-    "Unemployed": 0,
-    "< 1 year": 1,
-    "1–4 years": 2,
-    "4–7 years": 3,
-    "7+ years": 4
-}
-employment_duration = employment_mapping[employment_label]
+employment_duration = st.sidebar.selectbox(
+    "Employment Duration",
+    ["unemployed", "<1", "1<=X<4", "4<=X<7", ">=7"]
+)
 
 # Savings
-savings_label = st.sidebar.selectbox("Savings", [
-    "No savings",
-    "< 1000",
-    "1000–5000",
-    "> 5000"
-])
-
-savings_mapping = {
-    "No savings": 0,
-    "< 1000": 1,
-    "1000–5000": 2,
-    "> 5000": 3
-}
-savings = savings_mapping[savings_label]
+savings = st.sidebar.selectbox(
+    "Savings",
+    ["no savings", "<1000", "1000<=X<5000", ">=5000"]
+)
 
 # Purpose
-purpose_label = st.sidebar.selectbox("Purpose", [
-    "Car",
-    "Education",
-    "Business",
-    "Personal"
-])
-
-purpose_mapping = {
-    "Car": 0,
-    "Education": 1,
-    "Business": 2,
-    "Personal": 3
-}
-purpose = purpose_mapping[purpose_label]
+purpose = st.sidebar.selectbox(
+    "Purpose",
+    ["car", "education", "business", "radio/tv", "furniture", "others"]
+)
 
 # Other Debtors
-other_debtors_label = st.sidebar.selectbox("Other Debtors", ["No", "Yes"])
-other_debtors = 0 if other_debtors_label == "No" else 1
+other_debtors = st.sidebar.selectbox("Other Debtors", ["none", "yes"])
 
-# INPUT DATAFRAME
+# Housing
+housing = st.sidebar.selectbox("Housing", ["own", "rent", "free"])
 
+# Job
+job = st.sidebar.selectbox(
+    "Job",
+    ["unemployed", "unskilled", "skilled", "highly skilled"]
+)
+
+# Installment Rate
+installment_rate = st.sidebar.slider("Installment Rate", 1, 5)
+
+# Property
+property = st.sidebar.selectbox(
+    "Property",
+    ["real estate", "savings", "car", "unknown"]
+)
+
+# CREATE INPUT DATAFRAME
 input_data = pd.DataFrame([[
     credit_history,
     amount,
@@ -101,7 +82,11 @@ input_data = pd.DataFrame([[
     employment_duration,
     savings,
     purpose,
-    other_debtors
+    other_debtors,
+    housing,
+    job,
+    installment_rate,
+    property
 ]], columns=[
     "credit_history",
     "amount",
@@ -110,11 +95,19 @@ input_data = pd.DataFrame([[
     "employment_duration",
     "savings",
     "purpose",
-    "other_debtors"
+    "other_debtors",
+    "housing",
+    "job",
+    "installment_rate",
+    "property"
 ])
 
-# PREDICTION
+# APPLY ENCODING (VERY IMPORTANT)
+for col in input_data.columns:
+    if col in encoders:
+        input_data[col] = encoders[col].transform(input_data[col])
 
+# PREDICTION
 st.header("Prediction")
 
 if st.sidebar.button("Predict"):
@@ -126,14 +119,15 @@ if st.sidebar.button("Predict"):
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("Low Risk", round(prob_good, 2))
-    col2.metric("High Risk", round(prob_bad, 2))
+    col1.metric("Low Risk", f"{prob_good:.2f}")
+    col2.metric("High Risk", f"{prob_bad:.2f}")
 
     if prediction == 1:
         col3.success("Low Risk")
     else:
         col3.error("High Risk")
 
+    # Decision logic
     if prob_bad > 0.7:
         decision = "Reject Loan"
     elif prob_bad > 0.4:
@@ -150,10 +144,9 @@ if st.sidebar.button("Predict"):
 st.markdown("---")
 
 # DATA VISUALS
-
 st.header("Data Insights")
 
-data = pd.read_csv("credit_data.csv")
+data = pd.read_csv("data/credit_data.csv")
 
 col1, col2 = st.columns(2)
 
