@@ -11,69 +11,80 @@ encoders = joblib.load("encoders.pkl")
 # Page config
 st.set_page_config(page_title="Credit Risk System", layout="wide")
 
-# HEADER
 st.title("Credit Risk System")
 
-# MAIN IMAGE
-st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1", width=700)
+st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1")
 
 st.markdown("---")
 
 # SIDEBAR INPUT
 st.sidebar.header("Input Features")
 
-# Credit History
+# IMPORTANT → use SAME values as training dataset
+
 credit_history = st.sidebar.selectbox("Credit History", ["good", "bad"])
 
-# Loan Amount
 amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
 
-# Duration
 duration = st.sidebar.slider("Duration (months)", 1, 72)
 
-# Age
 age = st.sidebar.slider("Age", 18, 75)
 
-# Employment Duration
-employment_duration = st.sidebar.selectbox(
-    "Employment Duration",
-    ["unemployed", "<1", "1<=X<4", "4<=X<7", ">=7"]
-)
+employment_duration = st.sidebar.selectbox("Employment Duration", [
+    "unemployed",
+    "<1",
+    "1<=X<4",
+    "4<=X<7",
+    ">=7"
+])
 
-# Savings
-savings = st.sidebar.selectbox(
-    "Savings",
-    ["no savings", "<1000", "1000<=X<5000", ">=5000"]
-)
+savings = st.sidebar.selectbox("Savings", [
+    "unknown",
+    "<100",
+    "100<=X<500",
+    "500<=X<1000",
+    ">=1000"
+])
 
-# Purpose
-purpose = st.sidebar.selectbox(
-    "Purpose",
-    ["car", "education", "business", "radio/tv", "furniture", "others"]
-)
+purpose = st.sidebar.selectbox("Purpose", [
+    "car",
+    "education",
+    "business",
+    "radio/TV",
+    "furniture",
+    "repairs",
+    "others"
+])
 
-# Other Debtors
-other_debtors = st.sidebar.selectbox("Other Debtors", ["none", "yes"])
+other_debtors = st.sidebar.selectbox("Other Debtors", [
+    "none",
+    "co-applicant",
+    "guarantor"
+])
 
-# Housing
-housing = st.sidebar.selectbox("Housing", ["own", "rent", "free"])
+housing = st.sidebar.selectbox("Housing", [
+    "own",
+    "rent",
+    "free"
+])
 
-# Job
-job = st.sidebar.selectbox(
-    "Job",
-    ["unemployed", "unskilled", "skilled", "highly skilled"]
-)
+job = st.sidebar.selectbox("Job", [
+    "unskilled",
+    "skilled",
+    "highly skilled",
+    "management"
+])
 
-# Installment Rate
-installment_rate = st.sidebar.slider("Installment Rate", 1, 5)
+installment_rate = st.sidebar.slider("Installment Rate", 1, 4)
 
-# Property
-property = st.sidebar.selectbox(
-    "Property",
-    ["real estate", "savings", "car", "unknown"]
-)
+property_val = st.sidebar.selectbox("Property", [
+    "real estate",
+    "car",
+    "life insurance",
+    "unknown"
+])
 
-# CREATE INPUT DATAFRAME
+# CREATE INPUT DATAFRAME (ALL 12 FEATURES)
 input_data = pd.DataFrame([[
     credit_history,
     amount,
@@ -86,7 +97,7 @@ input_data = pd.DataFrame([[
     housing,
     job,
     installment_rate,
-    property
+    property_val
 ]], columns=[
     "credit_history",
     "amount",
@@ -102,7 +113,7 @@ input_data = pd.DataFrame([[
     "property"
 ])
 
-# APPLY ENCODING (VERY IMPORTANT)
+# APPLY ENCODING
 for col in input_data.columns:
     if col in encoders:
         input_data[col] = encoders[col].transform(input_data[col])
@@ -119,15 +130,14 @@ if st.sidebar.button("Predict"):
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("Low Risk", f"{prob_good:.2f}")
-    col2.metric("High Risk", f"{prob_bad:.2f}")
+    col1.metric("Low Risk", round(prob_good, 2))
+    col2.metric("High Risk", round(prob_bad, 2))
 
     if prediction == 1:
         col3.success("Low Risk")
     else:
         col3.error("High Risk")
 
-    # Decision logic
     if prob_bad > 0.7:
         decision = "Reject Loan"
     elif prob_bad > 0.4:
@@ -143,20 +153,18 @@ if st.sidebar.button("Predict"):
 
 st.markdown("---")
 
-# DATA VISUALS
+# VISUALS
 st.header("Data Insights")
 
 data = pd.read_csv("data/credit_data.csv")
 
 col1, col2 = st.columns(2)
 
-# Amount distribution
 fig1, ax1 = plt.subplots()
 sns.histplot(data["amount"], ax=ax1)
 ax1.set_title("Loan Amount")
 col1.pyplot(fig1)
 
-# Age distribution
 fig2, ax2 = plt.subplots()
 sns.histplot(data["age"], ax=ax2)
 ax2.set_title("Age")
