@@ -13,7 +13,7 @@ st.set_page_config(page_title="Credit Risk System", layout="wide")
 
 st.title("Credit Risk System")
 
-st.image("https://images.unsplash.com/photo-1569025690938-a00729c9e1d1")
+st.image("image.png", use_column_width=True)
 
 st.markdown("---")
 
