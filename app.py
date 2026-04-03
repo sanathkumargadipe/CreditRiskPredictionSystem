@@ -22,7 +22,10 @@ st.sidebar.header("Input Features")
 
 # IMPORTANT → use SAME values as training dataset
 
-credit_history = st.sidebar.selectbox("Credit History", ["good", "bad"])
+credit_history = st.sidebar.selectbox(
+    "Credit History",
+    list(encoders["credit_history"].classes_)
+)
 
 amount = st.sidebar.number_input("Loan Amount", min_value=100, step=100)
 
@@ -30,59 +33,40 @@ duration = st.sidebar.slider("Duration (months)", 1, 72)
 
 age = st.sidebar.slider("Age", 18, 75)
 
-employment_duration = st.sidebar.selectbox("Employment Duration", [
-    "unemployed",
-    "<1",
-    "1<=X<4",
-    "4<=X<7",
-    ">=7"
-])
+employment_duration = st.sidebar.selectbox(
+    "Employment Duration",
+    list(encoders["employment_duration"].classes_)
+)
 
-savings = st.sidebar.selectbox("Savings", [
-    "unknown",
-    "<100",
-    "100<=X<500",
-    "500<=X<1000",
-    ">=1000"
-])
+savings = st.sidebar.selectbox(
+    "Savings",
+    list(encoders["savings"].classes_)
+)
 
-purpose = st.sidebar.selectbox("Purpose", [
-    "car",
-    "education",
-    "business",
-    "radio/TV",
-    "furniture",
-    "repairs",
-    "others"
-])
+purpose = st.sidebar.selectbox(
+    "Purpose",
+    list(encoders["purpose"].classes_)
+)
 
-other_debtors = st.sidebar.selectbox("Other Debtors", [
-    "none",
-    "co-applicant",
-    "guarantor"
-])
+other_debtors = st.sidebar.selectbox(
+    "Other Debtors",
+    list(encoders["other_debtors"].classes_)
+)
 
-housing = st.sidebar.selectbox("Housing", [
-    "own",
-    "rent",
-    "free"
-])
+housing = st.sidebar.selectbox(
+    "Housing",
+    list(encoders["housing"].classes_)
+)
 
-job = st.sidebar.selectbox("Job", [
-    "unskilled",
-    "skilled",
-    "highly skilled",
-    "management"
-])
+job = st.sidebar.selectbox(
+    "Job",
+    list(encoders["job"].classes_)
+)
 
-installment_rate = st.sidebar.slider("Installment Rate", 1, 4)
-
-property_val = st.sidebar.selectbox("Property", [
-    "real estate",
-    "car",
-    "life insurance",
-    "unknown"
-])
+property_val = st.sidebar.selectbox(
+    "Property",
+    list(encoders["property"].classes_)
+)
 
 # CREATE INPUT DATAFRAME (ALL 12 FEATURES)
 input_data = pd.DataFrame([[
